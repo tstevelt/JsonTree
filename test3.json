@@ -1,0 +1,18 @@
+[
+{
+"name": "Alice",
+"age": 30,
+"friends": ["Paula","Suzy","Ellen"]
+},
+{
+"name": "Paula",
+"age": 19,
+"friends": ["Alice","Jerry","Tom"]
+},
+{
+"name": "Tom",
+"age": 72,
+"friends": ["Paula","Suzy","Mike"]
+}
+]
+
