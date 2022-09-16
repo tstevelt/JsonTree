@@ -52,7 +52,7 @@ int main ( int argc , char *argv []);
 int LoadScript ( char *ScriptFileName );
 
 /* ProcessArray.c */
-void ProcessArray ( struct json_object *Array , size_t ArrayLength );
+void ProcessArray ( struct json_object *Array , const size_t ArrayLength );
 
 /* ProcessObject.c */
 void ProcessObject ( struct json_object *Object );

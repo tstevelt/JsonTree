@@ -8,7 +8,7 @@
 
 #include	"JsonTree.h"
 
-void ProcessArray ( struct json_object *Array, size_t ArrayLength )
+void ProcessArray ( struct json_object *Array, const size_t ArrayLength )
 {
 	json_type		type;
 	json_object		*Elem;
@@ -17,6 +17,7 @@ void ProcessArray ( struct json_object *Array, size_t ArrayLength )
 	long			intValue;
 	double			dblValue;
 	json_bool		boolValue;
+	size_t			MyArrayLength;
 
 	IndentValue += 2;
 	for ( ndx = 0; ndx < ArrayLength; ndx++ )
@@ -36,32 +37,47 @@ void ProcessArray ( struct json_object *Array, size_t ArrayLength )
 				break;
 
 			case json_type_array:
-				ArrayLength = json_object_array_length ( Elem );
-				ProcessArray ( Elem, ArrayLength );
+				MyArrayLength = json_object_array_length ( Elem );
+				ProcessArray ( Elem, MyArrayLength );
 				break;
 
 			case json_type_string:
-				cp = json_object_get_string ( Elem );
-				Indent(); printf ( "%s\n", cp );
+				if ( RunMode == MODE_PRINT )
+				{
+					cp = json_object_get_string ( Elem );
+					Indent(); printf ( "%s\n", cp );
+				}
 				break;
 
 			case json_type_boolean:
-				boolValue = json_object_get_boolean ( Elem );
-				Indent(); printf ( "%s\n", boolValue ? "true" : "false" );
+				if ( RunMode == MODE_PRINT )
+				{
+					boolValue = json_object_get_boolean ( Elem );
+					Indent(); printf ( "%s\n", boolValue ? "true" : "false" );
+				}
 				break;
 
 			case json_type_double:
-				dblValue = json_object_get_double ( Elem );
-				Indent(); printf ( "%f\n", dblValue );
+				if ( RunMode == MODE_PRINT )
+				{
+					dblValue = json_object_get_double ( Elem );
+					Indent(); printf ( "%f\n", dblValue );
+				}
 				break;
 
 			case json_type_int:
-				intValue = json_object_get_int64 ( Elem );
-				Indent(); printf ( "%ld\n", intValue );
+				if ( RunMode == MODE_PRINT )
+				{
+					intValue = json_object_get_int64 ( Elem );
+					Indent(); printf ( "%ld\n", intValue );
+				}
 				break;
 
 			case json_type_null:
-				Indent(); printf ( "null\n" );
+				if ( RunMode == MODE_PRINT )
+				{
+					Indent(); printf ( "null\n" );
+				}
 				break;
 
 		}

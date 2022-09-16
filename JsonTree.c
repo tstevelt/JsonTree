@@ -60,7 +60,7 @@ int main ( int argc, char *argv[] )
 				ArrayLength = json_object_array_length ( root );
 				if ( Debug )
 				{
-					Indent(); printf ( "array length %ld\n", ArrayLength );
+					Indent(); printf ( "root array length %ld\n", ArrayLength );
 				}
 				ProcessArray ( root, ArrayLength );
 				break;
