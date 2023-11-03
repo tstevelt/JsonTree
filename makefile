@@ -4,6 +4,7 @@ LIB = JsonTree.a
 XLIB = -ljson-c
 DEF = /usr/local/include
 PRG = /usr/local/bin/$(PROG)
+
 CFLAGS = -g -Wall -Wformat-truncation=0 -I/usr/local/include
 
 FILES = \

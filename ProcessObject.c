@@ -140,6 +140,16 @@ void ProcessObject ( struct json_object *Object )
 			}
 
 			json_object_iter_next ( &it );
+
+			if ( json_object_iter_equal ( &it, &itEnd ) != 0 )
+			{
+				if ( Debug )
+				{
+					printf ( "json_object_iter_equal returned end -- " );
+					printf ( "-where may not work with this json file\n" );
+				}
+				continue;
+			}
 					
 			name2  = json_object_iter_peek_name(&it);
 			value2 = json_object_iter_peek_value(&it);
@@ -290,6 +300,56 @@ void ProcessObject ( struct json_object *Object )
 
 				case json_type_null:
 					Indent(); printf ( "%s:null\n", json_object_iter_peek_name(&it) );
+					break;
+
+				default:
+					break;
+			}
+		}
+		else if ( RunMode == MODE_CSV )
+		{
+			if ( Debug )
+			{
+				Indent(); printf ( "name: %s :: value type: %s\n", json_object_iter_peek_name(&it), type_ascii(type) );
+			}
+
+			switch ( type )
+			{
+				case json_type_object:
+					//Indent(); printf ( "%s\n", json_object_iter_peek_name(&it) );
+					ProcessObject ( value );
+					printf ( "\n" );
+					break;
+
+				case json_type_array:
+					//Indent(); printf ( "%s\n", json_object_iter_peek_name(&it) );
+					ArrayLength = json_object_array_length ( value );
+					ProcessArray ( value, ArrayLength );
+					printf ( "\n" );
+					break;
+
+				case json_type_boolean:
+					boolValue = json_object_get_boolean ( value );
+					printf ( "%s,", boolValue ? "true" : "false" );
+					break;
+
+				case json_type_double:
+					dblValue = json_object_get_double ( value );
+					printf ( "%f,", dblValue );
+					break;
+
+				case json_type_int:
+					intValue = json_object_get_int64 ( value );
+					printf ( "%ld,", intValue );
+					break;
+
+				case json_type_string:
+					cp = json_object_get_string ( value );
+					printf ( "%s,", cp );
+					break;
+
+				case json_type_null:
+					printf ( "null," );
 					break;
 
 				default:

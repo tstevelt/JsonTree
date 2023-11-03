@@ -6,26 +6,33 @@
 	it under the terms of the MIT license. See LICENSE for details.
 ---------------------------------------------------------------------------*/
 
+#include <errno.h>
 #include	"JsonTree.h"
 
 static void Usage ()
 {
-	printf ( "\n" );
-	printf ( "USAGE: JsonTree  file|-  [options]\n" );
-	printf ( "options:\n" );
-	printf ( "  -print         default behavior\n" );
-	printf ( "  -rm            remove input file after reading\n" );
-	printf ( "  -find x [...]  find one or more name and print only those values\n" );
-	printf ( "  -where fld val fld ... \n" );
-	printf ( "  -script file   get -find or -where from script\n" );
-	printf ( "  -d             debug\n" );
-	printf ( "\n" );
+	fprintf ( stderr, "\n" );
+	fprintf ( stderr, "USAGE: JsonTree  file  [options]\n" );
+	fprintf ( stderr, "options:\n" );
+	fprintf ( stderr, "  -print         default behavior\n" );
+	fprintf ( stderr, "  -csv           output as CSV file\n" );
+	fprintf ( stderr, "  -rm            remove input file after reading\n" );
+	fprintf ( stderr, "  -error         print input file on error\n" );
+	fprintf ( stderr, "  -find x [...]  find one or more name and print only those values\n" );
+	fprintf ( stderr, "  -where {sfld sval pfld} ... \n" );
+	fprintf ( stderr, "                 where sfld = sval print pfld\n" );
+	fprintf ( stderr, "  -script file   get -find or -where from script\n" );
+	fprintf ( stderr, "  -d             debug\n" );
+	fprintf ( stderr, "\n" );
 	exit ( 1 );
 }
 
-void getargs ( int argc, char *argv[] )
+long getargs ( int argc, char *argv[] )
 {
 	int		xa;
+	long	FileSize, nr, nw;
+	struct stat statbuf;
+	unsigned char	Buffer[10240];
 
 	if ( argc < 2 )
 	{
@@ -34,21 +41,52 @@ void getargs ( int argc, char *argv[] )
 
 	if ( strcmp ( argv[1], "-" ) == 0 )
 	{
-		fp = stdin;
 		isStdin = 1;
+		sprintf ( InputFile, "/var/local/tmp/JsonTree_%d.json", getpid() );
+
+		if (( fp = fopen ( InputFile, "w" )) == NULL )
+		{
+			fprintf ( stderr, "Cannot create %s for output\n", InputFile );
+			exit ( 1 );
+		}
+
+		/*---------------------------------------------------------------------------
+		   fread, fwrite - binary stream input/output
+		   #include <stdio.h>
+		   size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+		   size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+		---------------------------------------------------------------------------*/
+
+		while (( nr = fread ( Buffer, 1, sizeof(Buffer), stdin )) > 0 )
+		{
+			nw = fwrite ( Buffer, 1, nr, fp );
+			if ( nw != nr )
+			{
+				fprintf ( stderr, "fwrite error: %s\n", strerror(errno) );
+				exit ( 1 );
+			}
+		}
+
+		fclose ( fp );
 	}
 	else
 	{
-		InputFile = argv[1];
-		if (( fp = fopen ( InputFile, "r" )) == NULL )
-		{
-			printf ( "Cannot open %s\n", argv[1] );
-			exit ( 0 );
-		}
 		isStdin = 0;
+		sprintf ( InputFile, "%s", argv[1] );
+	}
+
+	stat ( InputFile, &statbuf );
+	FileSize = statbuf.st_size;
+	// fprintf ( stderr,File size: %ld bytes\n", FileSize );
+
+	if (( fp = fopen ( InputFile, "r" )) == NULL )
+	{
+		fprintf ( stderr, "Cannot open %s\n", InputFile );
+		exit ( 0 );
 	}
 
 	RunMode = MODE_PRINT;
+	PrintFileOnError = 0;
 	DeleteFile = 0;
 	Debug = 0;
 
@@ -57,6 +95,14 @@ void getargs ( int argc, char *argv[] )
 		if ( strcmp ( argv[xa], "-print" ) == 0 )
 		{
 			RunMode = MODE_PRINT;
+		}
+		else if ( strcmp ( argv[xa], "-csv" ) == 0 )
+		{
+			RunMode = MODE_CSV;
+		}
+		else if ( strcmp ( argv[xa], "-error" ) == 0 )
+		{
+			PrintFileOnError = 1;
 		}
 		else if ( xa + 1 < argc && strcmp ( argv[xa], "-find" ) == 0 )
 		{
@@ -70,7 +116,7 @@ void getargs ( int argc, char *argv[] )
 				}
 				if ( FindCount >= MAXFIND )
 				{
-					printf ( "Exceeds MAXFIND %d\n", MAXFIND );
+					fprintf ( stderr, "Exceeds MAXFIND %d\n", MAXFIND );
 					exit ( 1 );
 				}
 
@@ -91,7 +137,7 @@ void getargs ( int argc, char *argv[] )
 				}
 				if ( WhereCount >= MAXFIND )
 				{
-					printf ( "Exceeds MAXFIND %d\n", MAXFIND );
+					fprintf ( stderr, "Exceeds MAXFIND %d\n", MAXFIND );
 					exit ( 1 );
 				}
 				snprintf ( WhereArray[WhereCount].Field, MAXSTRING, "%s", argv[xa] );
@@ -119,17 +165,17 @@ void getargs ( int argc, char *argv[] )
 		}
 		else 
 		{
-			Usage ();
+			fprintf ( stderr, "Unknown argument %s\n", argv[xa] );
 		}
 	}
 	if ( RunMode == MODE_FIND && FindCount == 0 )
 	{
-		printf ( "No search criteria\n" );
+		fprintf ( stderr, "No search criteria\n" );
 		exit ( 1 );
 	}
 	else if ( RunMode == MODE_WHERE && WhereCount == 0 )
 	{
-		printf ( "No search criteria\n" );
+		fprintf ( stderr, "No search criteria\n" );
 		exit ( 1 );
 	}
 
@@ -144,4 +190,6 @@ void getargs ( int argc, char *argv[] )
 			printf ( "Where %s %s %s\n", WhereArray[xa].Field, WhereArray[xa].Value, WhereArray[xa].Name );
 		}
 	}
+
+	return ( FileSize );
 }

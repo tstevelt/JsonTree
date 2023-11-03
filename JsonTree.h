@@ -3,6 +3,10 @@
 #include	<stdlib.h>
 #include	<unistd.h>
 #include	<string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include	<json-c/json.h>
 
 #ifdef MAIN
@@ -12,13 +16,15 @@
 #endif
 
 #define		MODE_PRINT	1
-#define		MODE_FIND	2
-#define		MODE_WHERE	3
+#define		MODE_CSV	2
+#define		MODE_FIND	3
+#define		MODE_WHERE	4
 
-TYPE	char	*InputFile;
+TYPE	char	InputFile[512];
 TYPE	int		isStdin;
 TYPE	FILE	*fp;
 TYPE	int		RunMode;
+TYPE	int		PrintFileOnError;
 TYPE	int		DeleteFile;
 TYPE	int		Debug;
 TYPE	int		IndentValue;
@@ -43,7 +49,7 @@ void Indent ( void );
 char *type_ascii ( json_type type );
 
 /* getargs.c */
-void getargs ( int argc , char *argv []);
+long getargs ( int argc , char *argv []);
 
 /* JsonTree.c */
 int main ( int argc , char *argv []);

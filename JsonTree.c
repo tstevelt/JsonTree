@@ -15,6 +15,7 @@
 	---------------------------------------------------------------------
 	tms		09/13/2022	Refactored into modules.  Added -find option.
 	tms		09/14/2022	Added -where and -script options.
+	tms		11/02/2023	Get file size and malloc xbuffer
 
 ----------------------------------------------------------------------------*/
 
@@ -23,28 +24,41 @@
 
 int main ( int argc, char *argv[] )
 {
-	char	xbuffer[20000];
+	char				*xbuffer;
 	struct json_object	*root;
-	json_type					type;
-	size_t						ArrayLength;
+	json_type			type;
+	json_tokener		*tok;
+	size_t				ArrayLength;
+	long				FileSize = 0L;
 
-	getargs ( argc, argv );
+	FileSize = getargs ( argc, argv );
 
-	memset ( xbuffer, '\0', sizeof(xbuffer) );
-	fread ( xbuffer, 1, sizeof(xbuffer), fp );
+	xbuffer = malloc ( FileSize );
+	fread ( xbuffer, 1, FileSize, fp );
 
 	if ( isStdin == 0 )
 	{
 		fclose ( fp );
 	}
-	else if ( DeleteFile )
+	else if ( DeleteFile || isStdin )
 	{
 		unlink ( InputFile );
 	}
 
-	if (( root = json_tokener_parse ( xbuffer )) == NULL )
+	tok = json_tokener_new();
+
+	if (( root = json_tokener_parse_ex ( tok, xbuffer, FileSize )) == NULL )
 	{
 		printf ( "json_tokener_parse failed\n" );
+		enum json_tokener_error jerr = json_tokener_get_error (tok);
+		printf ( "%s\n", json_tokener_error_desc(jerr) );
+
+		if ( PrintFileOnError && isStdin == 0 )
+		{
+			char	cmdline[1024];
+			sprintf ( cmdline, "cat %s", InputFile );
+			system ( cmdline );
+		}
 	}
 	else
 	{
@@ -71,5 +85,6 @@ int main ( int argc, char *argv[] )
 		}
 	}
 
+	free ( xbuffer );
 	return ( 0 );
 }
