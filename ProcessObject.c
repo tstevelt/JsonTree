@@ -51,8 +51,12 @@ void ProcessObject ( struct json_object *Object )
 					if ( found )
 					{
 						printf ( "object\n" );
+						PrintObject ( value );
 					}
-					ProcessObject ( value );
+					else
+					{
+						ProcessObject ( value );
+					}
 					break;
 
 				case json_type_array:
@@ -60,8 +64,12 @@ void ProcessObject ( struct json_object *Object )
 					if ( found )
 					{
 						printf ( "array[%ld]\n", ArrayLength );
+						PrintArray ( value, ArrayLength );
 					}
-					ProcessArray ( value, ArrayLength );
+					else
+					{
+						ProcessArray ( value, ArrayLength );
+					}
 					break;
 
 				case json_type_boolean:
@@ -306,6 +314,7 @@ void ProcessObject ( struct json_object *Object )
 					break;
 			}
 		}
+#ifdef NOT_DONE_YET
 		else if ( RunMode == MODE_CSV )
 		{
 			if ( Debug )
@@ -356,7 +365,7 @@ void ProcessObject ( struct json_object *Object )
 					break;
 			}
 		}
-
+#endif
 		json_object_iter_next ( &it );
 	}
 

@@ -12,13 +12,14 @@
 static void Usage ()
 {
 	fprintf ( stderr, "\n" );
-	fprintf ( stderr, "USAGE: JsonTree  file  [options]\n" );
+	fprintf ( stderr, "USAGE: JsonTree file|- [options]\n" );
 	fprintf ( stderr, "options:\n" );
 	fprintf ( stderr, "  -print         default behavior\n" );
-	fprintf ( stderr, "  -csv           output as CSV file\n" );
+	fprintf ( stderr, "  -fmt {std|csv} Indented Standare or CSV\n" );
 	fprintf ( stderr, "  -rm            remove input file after reading\n" );
 	fprintf ( stderr, "  -error         print input file on error\n" );
 	fprintf ( stderr, "  -find x [...]  find one or more name and print only those values\n" );
+	fprintf ( stderr, "  -array {first|last|all} (currently only with -find}\n" );
 	fprintf ( stderr, "  -where {sfld sval pfld} ... \n" );
 	fprintf ( stderr, "                 where sfld = sval print pfld\n" );
 	fprintf ( stderr, "  -script file   get -find or -where from script\n" );
@@ -86,7 +87,9 @@ long getargs ( int argc, char *argv[] )
 	}
 
 	RunMode = MODE_PRINT;
+	Format = FORMAT_STD;
 	PrintFileOnError = 0;
+	ArrayIndex = ARRAY_ALL;
 	DeleteFile = 0;
 	Debug = 0;
 
@@ -96,9 +99,41 @@ long getargs ( int argc, char *argv[] )
 		{
 			RunMode = MODE_PRINT;
 		}
-		else if ( strcmp ( argv[xa], "-csv" ) == 0 )
+		else if ( xa + 1 < argc && strcmp ( argv[xa], "-fmt" ) == 0 )
 		{
-			RunMode = MODE_CSV;
+			xa++;
+			if ( strcmp ( argv[xa], "std" ) == 0 )
+			{
+				Format = FORMAT_STD;
+			}
+			else if ( strcmp ( argv[xa], "csv" ) == 0 )
+			{
+				Format = FORMAT_CSV;
+			}
+			else
+			{
+				Usage ();
+			}
+		}
+		else if ( xa + 1 < argc && strcmp ( argv[xa], "-array" ) == 0 )
+		{
+			xa++;
+			if ( strcmp ( argv[xa], "first" ) == 0 )
+			{
+				ArrayIndex = ARRAY_FIRST;
+			}
+			else if ( strcmp ( argv[xa], "last" ) == 0 )
+			{
+				ArrayIndex = ARRAY_LAST;
+			}
+			else if ( strcmp ( argv[xa], "all" ) == 0 )
+			{
+				ArrayIndex = ARRAY_ALL;
+			}
+			else
+			{
+				Usage ();
+			}
 		}
 		else if ( strcmp ( argv[xa], "-error" ) == 0 )
 		{

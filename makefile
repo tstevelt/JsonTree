@@ -10,7 +10,9 @@ CFLAGS = -g -Wall -Wformat-truncation=0 -I/usr/local/include
 FILES = \
 	$(LIB)(JsonTree.o)		\
 	$(LIB)(Functions.o)		\
+	$(LIB)(PrintArray.o)	\
 	$(LIB)(ProcessArray.o)	\
+	$(LIB)(PrintObject.o)	\
 	$(LIB)(ProcessObject.o)	\
 	$(LIB)(LoadScript.o)	\
 	$(LIB)(getargs.o)

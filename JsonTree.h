@@ -16,14 +16,22 @@
 #endif
 
 #define		MODE_PRINT	1
-#define		MODE_CSV	2
-#define		MODE_FIND	3
-#define		MODE_WHERE	4
+#define		MODE_FIND	2
+#define		MODE_WHERE	3
+TYPE	int		RunMode;
+
+#define		FORMAT_STD	1
+#define		FORMAT_CSV	2
+TYPE	int		Format;
+
+#define		ARRAY_LAST	1
+#define		ARRAY_FIRST	2
+#define		ARRAY_ALL	3
+TYPE	int		ArrayIndex;
 
 TYPE	char	InputFile[512];
 TYPE	int		isStdin;
 TYPE	FILE	*fp;
-TYPE	int		RunMode;
 TYPE	int		PrintFileOnError;
 TYPE	int		DeleteFile;
 TYPE	int		Debug;
@@ -57,8 +65,14 @@ int main ( int argc , char *argv []);
 /* LoadScript.c */
 int LoadScript ( char *ScriptFileName );
 
+/* PrintArray.c */
+void PrintArray ( struct json_object *Array , const size_t ArrayLength );
+
 /* ProcessArray.c */
 void ProcessArray ( struct json_object *Array , const size_t ArrayLength );
+
+/* PrintObject.c */
+void PrintObject ( struct json_object *Object );
 
 /* ProcessObject.c */
 void ProcessObject ( struct json_object *Object );
