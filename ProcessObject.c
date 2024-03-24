@@ -17,7 +17,7 @@ void ProcessObject ( struct json_object *Object )
 	struct json_object			*value, *value1, *value2;
 	size_t						ArrayLength;
 	const char *cp;
-	int 	ndx, len, found;
+	int 	ndx, found;
 	long	intValue;
 	double	dblValue;
 	json_bool	boolValue;
@@ -33,16 +33,23 @@ void ProcessObject ( struct json_object *Object )
 		value = json_object_iter_peek_value(&it);
 		type  = json_object_get_type ( value );
 
-		if ( RunMode == MODE_FIND )
+		if ( RunMode == MODE_FIND ||  RunMode == MODE_PRINT )
 		{
-			for ( ndx = 0, found = 0; ndx < FindCount; ndx++ )
+			if ( RunMode == MODE_FIND )
 			{
-				if ( strcmp ( name, FindArray[ndx] ) == 0 )
+				for ( ndx = 0, found = 0; ndx < FindCount; ndx++ )
 				{
-					printf ( "%s : ", name );
-					found = 1;
-					break;
+					if ( strcmp ( name, FindArray[ndx] ) == 0 )
+					{
+						printf ( "%s : ", name );
+						found = 1;
+						break;
+					}
 				}
+			}
+			else
+			{	
+				found = 1;
 			}
 
 			switch ( type )
@@ -241,6 +248,7 @@ void ProcessObject ( struct json_object *Object )
 					break;
 			}
 		}
+#ifdef STUFF
 		else if ( RunMode == MODE_PRINT )
 		{
 			if ( Debug )
@@ -314,6 +322,7 @@ void ProcessObject ( struct json_object *Object )
 					break;
 			}
 		}
+#endif
 #ifdef NOT_DONE_YET
 		else if ( RunMode == MODE_CSV )
 		{

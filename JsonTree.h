@@ -36,6 +36,7 @@ TYPE	int		PrintFileOnError;
 TYPE	int		DeleteFile;
 TYPE	int		Debug;
 TYPE	int		IndentValue;
+TYPE	int		WrapLong;
 
 #define		MAXSTRING	128
 #define		MAXFIND		20

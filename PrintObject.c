@@ -110,7 +110,18 @@ void PrintObject ( struct json_object *Object )
 				cp = json_object_get_string ( value );
 				if ( Format == FORMAT_STD )
 				{
-					Indent(); printf ( "%s:%s\n", json_object_iter_peek_name(&it), cp );
+					Indent(); 
+					if ( WrapLong == 0 )
+					{
+						printf ( "%s:%s\n", json_object_iter_peek_name(&it), cp );
+					}
+					else
+					{
+						char	Wrapper[32];
+						int		asciiPercent = 37;
+						sprintf ( Wrapper, "%cs:%c-.%ds\n", asciiPercent, asciiPercent, WrapLong );
+						printf ( Wrapper, json_object_iter_peek_name(&it), cp );
+					}
 				}
 				else
 				{

@@ -23,6 +23,7 @@ static void Usage ()
 	fprintf ( stderr, "  -where {sfld sval pfld} ... \n" );
 	fprintf ( stderr, "                 where sfld = sval print pfld\n" );
 	fprintf ( stderr, "  -script file   get -find or -where from script\n" );
+	fprintf ( stderr, "  -wrap #        currently just cuts long lines\n" );
 	fprintf ( stderr, "  -d             debug\n" );
 	fprintf ( stderr, "\n" );
 	exit ( 1 );
@@ -91,6 +92,7 @@ long getargs ( int argc, char *argv[] )
 	PrintFileOnError = 0;
 	ArrayIndex = ARRAY_ALL;
 	DeleteFile = 0;
+	WrapLong = 0;
 	Debug = 0;
 
 	for ( xa = 2; xa < argc; xa++ )
@@ -138,6 +140,11 @@ long getargs ( int argc, char *argv[] )
 		else if ( strcmp ( argv[xa], "-error" ) == 0 )
 		{
 			PrintFileOnError = 1;
+		}
+		else if ( xa + 1 < argc && strcmp ( argv[xa], "-wrap" ) == 0 )
+		{
+			xa++;
+			WrapLong = atoi(argv[xa]);
 		}
 		else if ( xa + 1 < argc && strcmp ( argv[xa], "-find" ) == 0 )
 		{

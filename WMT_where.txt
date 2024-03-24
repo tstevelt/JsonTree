@@ -1,7 +1,0 @@
-
-where
-{
-	dataCode currentRatio value 
-	dataCode profitMargin value
-}
-

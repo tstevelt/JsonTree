@@ -1,8 +1,0 @@
-
-find
-{
-	name
-	title 
-	country
-}
-
